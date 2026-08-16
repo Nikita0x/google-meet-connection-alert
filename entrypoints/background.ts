@@ -1,55 +1,89 @@
-import { enabledItem } from '@/utils/settings';
+import { connectionStatusItem } from "@/utils/settings";
+import type { CONNECTION_STATUS } from "@/utils/settings";
 
-export default defineBackground(() => {
-  const COLOR_ON = '#22c55e';
-  const COLOR_OFF = '#ef4444';
-  const COLOR_INACTIVE_TAB = '#9ca3af';
+export default defineBackground(async () => {
+    let connectionStatus = await connectionStatusItem.getValue();
+    let consecutiveErrors = 0;
+    let consecutiveSuccesses = 0;
 
-  const isMeetUrl = (url?: string) => !!url && url.startsWith('https://meet.google.com/');
+    browser.webRequest.onErrorOccurred.addListener(
+        async (details) => {
+            // console.log("CONNECTION_LOST - details: ", details);
+            consecutiveErrors++;
+            consecutiveSuccesses = 0;
 
-  const updateBadgeForTab = async (tabId: number) => {
-    let tab: Browser.tabs.Tab;
-    try {
-      tab = await browser.tabs.get(tabId);
-    } catch {
-      return;
-    }
+            if (consecutiveErrors >= 5) {
+                console.log("Connection lost.");
 
-    if (!isMeetUrl(tab.url)) {
-      await browser.action.setBadgeBackgroundColor({ color: COLOR_INACTIVE_TAB });
-      await browser.action.setBadgeText({ text: '' });
-      return;
-    }
+                connectionStatus = "disconnected";
+                await connectionStatusItem.setValue(connectionStatus);
 
-    const enabled = await enabledItem.getValue();
-    await browser.action.setBadgeBackgroundColor({ color: enabled ? COLOR_ON : COLOR_OFF });
-    await browser.action.setBadgeText({ text: enabled ? 'ON' : 'OFF' });
-  };
+                updateExtensionBadge(connectionStatus);
+            }
+        },
+        {
+            urls: ["https://meet.google.com/*"],
+            types: ["xmlhttprequest"],
+        },
+    );
 
-  const updateActiveTabBadge = async () => {
-    const [activeTab] = await browser.tabs.query({ active: true, currentWindow: true });
-    if (activeTab?.id !== undefined) {
-      await updateBadgeForTab(activeTab.id);
-    }
-  };
+    browser.webRequest.onCompleted.addListener(
+        async (details) => {
+            // console.log("CONNECTED - details: ", details);
 
-  browser.tabs.onActivated.addListener(({ tabId }) => {
-    updateBadgeForTab(tabId);
-  });
+            consecutiveSuccesses++;
+            consecutiveErrors = 0;
 
-  browser.tabs.onUpdated.addListener((tabId, changeInfo) => {
-    if (changeInfo.status === 'complete' || changeInfo.url) {
-      updateBadgeForTab(tabId);
-    }
-  });
+            if (consecutiveSuccesses >= 5) {
+                console.log("Connection resumed.");
+                connectionStatus = "connected";
 
-  browser.windows.onFocusChanged.addListener(() => {
-    updateActiveTabBadge();
-  });
+                await connectionStatusItem.setValue(connectionStatus);
+                updateExtensionBadge(connectionStatus);
+            }
+        },
+        {
+            urls: ["https://meet.google.com/*"],
+            types: ["xmlhttprequest"],
+        },
+    );
 
-  enabledItem.watch(() => {
-    updateActiveTabBadge();
-  });
-
-  updateActiveTabBadge();
+    browser.tabs.onCreated.addListener(updateMeetTabState);
+    browser.tabs.onRemoved.addListener(updateMeetTabState);
+    browser.tabs.onUpdated.addListener(updateMeetTabState);
 });
+
+function updateExtensionBadge(connectionStatus: CONNECTION_STATUS) {
+    if (connectionStatus === "disconnected") {
+        browser.action.setBadgeText({ text: "OFF" });
+        browser.action.setBadgeBackgroundColor({ color: "#ef4444" });
+        browser.action.setTitle({
+            title: "Google Meet - Connection is lost.",
+        });
+        return;
+    }
+
+    browser.action.setBadgeText({ text: "ON" });
+    browser.action.setBadgeBackgroundColor({ color: "#22c55e" });
+    browser.action.setTitle({
+        title: "Google Meet - Connected.",
+    });
+}
+
+async function updateMeetTabState() {
+    const meetTabs = await browser.tabs.query({
+        url: "https://meet.google.com/*",
+    });
+
+    if (meetTabs.length === 0) {
+        browser.action.setBadgeText({ text: "!" });
+        browser.action.setBadgeBackgroundColor({ color: "#A9A9A9" });
+        browser.action.setTitle({
+            title: "No Google Meet tabs are open.",
+        });
+        return;
+    }
+
+    let connectionStatus = await connectionStatusItem.getValue();
+    updateExtensionBadge(connectionStatus);
+}
