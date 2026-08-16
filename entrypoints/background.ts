@@ -1,24 +1,22 @@
-import { connectionStatusItem } from "@/utils/settings";
-import type { CONNECTION_STATUS } from "@/utils/settings";
+import { getConnectionStatus, setConnectionStatus } from "@/store/settings.store";
 
-export default defineBackground(async () => {
-    let connectionStatus = await connectionStatusItem.getValue();
+export default defineBackground(() => {
     let consecutiveErrors = 0;
     let consecutiveSuccesses = 0;
 
     browser.webRequest.onErrorOccurred.addListener(
         async (details) => {
-            // console.log("CONNECTION_LOST - details: ", details);
+            let connectionStatus = await getConnectionStatus();
             consecutiveErrors++;
             consecutiveSuccesses = 0;
 
-            if (consecutiveErrors >= 5) {
-                console.log("Connection lost.");
+            if (consecutiveErrors >= 5 && connectionStatus !== "disconnected") {
+                const hasMeet = await hasMeetTabs();
 
-                connectionStatus = "disconnected";
-                await connectionStatusItem.setValue(connectionStatus);
+                if (!hasMeet) return;
 
-                updateExtensionBadge(connectionStatus);
+                await setConnectionStatus("disconnected");
+                await updateExtensionBadge();
             }
         },
         {
@@ -29,17 +27,18 @@ export default defineBackground(async () => {
 
     browser.webRequest.onCompleted.addListener(
         async (details) => {
-            // console.log("CONNECTED - details: ", details);
-
+            let connectionStatus = await getConnectionStatus();
             consecutiveSuccesses++;
             consecutiveErrors = 0;
 
-            if (consecutiveSuccesses >= 5) {
-                console.log("Connection resumed.");
-                connectionStatus = "connected";
+            if (consecutiveSuccesses >= 5 && connectionStatus !== "connected") {
+                const hasMeet = await hasMeetTabs();
 
-                await connectionStatusItem.setValue(connectionStatus);
-                updateExtensionBadge(connectionStatus);
+                if (!hasMeet) return;
+
+                await setConnectionStatus("connected");
+
+                await updateExtensionBadge();
             }
         },
         {
@@ -48,42 +47,67 @@ export default defineBackground(async () => {
         },
     );
 
-    browser.tabs.onCreated.addListener(updateMeetTabState);
-    browser.tabs.onRemoved.addListener(updateMeetTabState);
-    browser.tabs.onUpdated.addListener(updateMeetTabState);
+    browser.tabs.onCreated.addListener(() => {
+        updateMeetTabState();
+    });
+
+    browser.tabs.onRemoved.addListener((tabId) => {
+        updateMeetTabState();
+    });
+
+    browser.tabs.onUpdated.addListener((tabId, changeInfo) => {
+        updateMeetTabState();
+    });
 });
 
-function updateExtensionBadge(connectionStatus: CONNECTION_STATUS) {
+async function updateExtensionBadge() {
+    let connectionStatus = await getConnectionStatus();
+
     if (connectionStatus === "disconnected") {
-        browser.action.setBadgeText({ text: "OFF" });
-        browser.action.setBadgeBackgroundColor({ color: "#ef4444" });
-        browser.action.setTitle({
+        await browser.action.setBadgeText({ text: "OFF" });
+        await browser.action.setBadgeBackgroundColor({
+            color: "#ef4444",
+        });
+        await browser.action.setTitle({
             title: "Google Meet - Connection is lost.",
         });
+
         return;
     }
 
-    browser.action.setBadgeText({ text: "ON" });
-    browser.action.setBadgeBackgroundColor({ color: "#22c55e" });
-    browser.action.setTitle({
+    await browser.action.setBadgeText({ text: "ON" });
+    await browser.action.setBadgeBackgroundColor({
+        color: "#22c55e",
+    });
+    await browser.action.setTitle({
         title: "Google Meet - Connected.",
     });
 }
 
 async function updateMeetTabState() {
+    const hasMeet = await hasMeetTabs();
+
+    if (!hasMeet) {
+        await browser.action.setBadgeText({ text: "!" });
+
+        await browser.action.setBadgeBackgroundColor({
+            color: "#A9A9A9",
+        });
+
+        await browser.action.setTitle({
+            title: "No Google Meet tabs are open.",
+        });
+
+        return;
+    }
+
+    await updateExtensionBadge();
+}
+
+async function hasMeetTabs() {
     const meetTabs = await browser.tabs.query({
         url: "https://meet.google.com/*",
     });
 
-    if (meetTabs.length === 0) {
-        browser.action.setBadgeText({ text: "!" });
-        browser.action.setBadgeBackgroundColor({ color: "#A9A9A9" });
-        browser.action.setTitle({
-            title: "No Google Meet tabs are open.",
-        });
-        return;
-    }
-
-    let connectionStatus = await connectionStatusItem.getValue();
-    updateExtensionBadge(connectionStatus);
+    return meetTabs.length > 0;
 }

@@ -1,4 +1,4 @@
-import { enabledItem, repeatIntervalMsItem, volumeItem } from "@/utils/settings";
+import { enabledItem, repeatIntervalMsItem, volumeItem } from "@/store/settings.store";
 
 export default defineContentScript({
     matches: ["*://meet.google.com/*"],
@@ -39,9 +39,6 @@ export default defineContentScript({
     //     setTimeout(() => ctx.close(), 1000);
     //   };
 
-    //   const matchesAnyPhrase = (text: string) =>
-    //     phrases.some((phrase) => phrase.trim() && text.includes(phrase));
-
     //   const stopRepeating = () => {
     //     if (repeatTimer !== null) {
     //       clearInterval(repeatTimer);
@@ -73,17 +70,13 @@ export default defineContentScript({
     //   };
 
     //   const loadSettings = async () => {
-    //     [phrases, enabled, volume, repeatIntervalMs] = await Promise.all([
-    //       phrasesItem.getValue(),
+    //     [enabled, volume, repeatIntervalMs] = await Promise.all([
     //       enabledItem.getValue(),
     //       volumeItem.getValue(),
     //       repeatIntervalMsItem.getValue(),
     //     ]);
     //   };
 
-    //   phrasesItem.watch((value) => {
-    //     phrases = value;
-    //   });
     //   enabledItem.watch((value) => {
     //     enabled = value;
     //     if (!enabled) {
@@ -97,16 +90,4 @@ export default defineContentScript({
     //   repeatIntervalMsItem.watch((value) => {
     //     repeatIntervalMs = value;
     //   });
-
-    //   const observer = new MutationObserver(scheduleCheck);
-
-    //   loadSettings().then(() => {
-    //     observer.observe(document.body, {
-    //       childList: true,
-    //       subtree: true,
-    //       characterData: true,
-    //     });
-    //     checkForDisconnect();
-    //   });
-    // },
 });

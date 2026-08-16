@@ -7,6 +7,14 @@ export const connectionStatusItem = storage.defineItem<CONNECTION_STATUS>(
     },
 );
 
+export function getConnectionStatus() {
+    return connectionStatusItem.getValue();
+}
+
+export async function setConnectionStatus(status: CONNECTION_STATUS) {
+    await connectionStatusItem.setValue(status);
+}
+
 export const enabledItem = storage.defineItem<boolean>("local:enabled", {
     fallback: true,
 });
