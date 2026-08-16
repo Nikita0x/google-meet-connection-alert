@@ -1,4 +1,14 @@
 export type CONNECTION_STATUS = "connected" | "disconnected";
+export type CONNECTION_EVENT = "request_failed" | "request_succeeded";
+export type CONNECTION_STATE = {
+    status: CONNECTION_STATUS;
+    consecutiveErrors: number;
+    consecutiveSuccesses: number;
+};
+
+export type TransitionFunctions = {
+    [K in CONNECTION_EVENT]: (state: CONNECTION_STATE) => CONNECTION_STATE;
+};
 
 export const connectionStatusItem = storage.defineItem<CONNECTION_STATUS>(
     "local:connection_status",

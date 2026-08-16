@@ -1,20 +1,29 @@
 import { getConnectionStatus, setConnectionStatus } from "@/store/settings.store";
+import type {
+    CONNECTION_EVENT,
+    CONNECTION_STATE,
+    TransitionFunctions,
+} from "@/store/settings.store";
 
 export default defineBackground(() => {
-    let consecutiveErrors = 0;
-    let consecutiveSuccesses = 0;
+    const initialState: CONNECTION_STATE = {
+        status: "disconnected",
+        consecutiveErrors: 0,
+        consecutiveSuccesses: 0,
+    };
+    let state = initialState;
 
     browser.webRequest.onErrorOccurred.addListener(
         async (details) => {
-            let connectionStatus = await getConnectionStatus();
-            consecutiveErrors++;
-            consecutiveSuccesses = 0;
+            const hasMeet = await hasMeetTabs();
 
-            if (consecutiveErrors >= 5 && connectionStatus !== "disconnected") {
-                const hasMeet = await hasMeetTabs();
+            if (!hasMeet) return;
 
-                if (!hasMeet) return;
+            const previousState = state;
 
+            state = transition(state, "request_failed");
+
+            if (previousState.status !== state.status) {
                 await setConnectionStatus("disconnected");
                 await updateExtensionBadge();
             }
@@ -27,15 +36,14 @@ export default defineBackground(() => {
 
     browser.webRequest.onCompleted.addListener(
         async (details) => {
-            let connectionStatus = await getConnectionStatus();
-            consecutiveSuccesses++;
-            consecutiveErrors = 0;
+            const hasMeet = await hasMeetTabs();
 
-            if (consecutiveSuccesses >= 5 && connectionStatus !== "connected") {
-                const hasMeet = await hasMeetTabs();
+            if (!hasMeet) return;
 
-                if (!hasMeet) return;
+            const previousState = state;
 
+            state = transition(state, "request_succeeded");
+            if (previousState.status !== state.status) {
                 await setConnectionStatus("connected");
 
                 await updateExtensionBadge();
@@ -110,4 +118,27 @@ async function hasMeetTabs() {
     });
 
     return meetTabs.length > 0;
+}
+
+const transitions: TransitionFunctions = {
+    request_succeeded: (state) => {
+        const successes = state.consecutiveSuccesses + 1;
+        return {
+            consecutiveErrors: 0,
+            consecutiveSuccesses: successes,
+            status: successes >= 5 ? "connected" : state.status,
+        };
+    },
+    request_failed: (state) => {
+        const errors = state.consecutiveErrors + 1;
+        return {
+            consecutiveSuccesses: 0,
+            consecutiveErrors: errors,
+            status: errors >= 5 ? "disconnected" : state.status,
+        };
+    },
+};
+
+function transition(state: CONNECTION_STATE, event: CONNECTION_EVENT): CONNECTION_STATE {
+    return transitions[event](state);
 }
