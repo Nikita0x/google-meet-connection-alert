@@ -30,7 +30,7 @@ export const enabledItem = storage.defineItem<boolean>("local:enabled", {
 });
 
 export const volumeItem = storage.defineItem<number>("local:volume", {
-    fallback: 0.8,
+    fallback: 1,
 });
 
 export const repeatIntervalMsItem = storage.defineItem<number>("local:repeatIntervalMs", {
