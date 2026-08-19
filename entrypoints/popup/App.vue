@@ -1,36 +1,29 @@
 <template>
     <div class="popup">
-        <h1>Meet Reconnect Alert</h1>
-        <button :class="['toggle', enabled ? 'on' : 'off']" @click="toggle">
+        <h1>Google Meet Connection Alert</h1>
+        <!-- <button :class="['toggle', enabled ? 'on' : 'off']" @click="toggle">
             {{ enabled ? "Disable" : "Enable" }} Notifications when Connection is Lost
-        </button>
+        </button> -->
         <p class="status">
-            Status: <strong>{{ enabled ? "Enabled" : "Disabled" }}</strong>
+            Status: <strong>{{ status === "connected" ? "Connected" : "Disconnected" }}</strong>
         </p>
     </div>
 </template>
 
 <script setup lang="ts">
 import { onMounted, onUnmounted, ref } from "vue";
-import { enabledItem } from "@/store/settings.store";
+import { connectionStatusItem, getConnectionStatus } from "@/store/settings.store";
+import type { CONNECTION_STATUS } from "@/store/settings.store";
 
-const enabled = ref(true);
-let unwatch: (() => void) | undefined;
+const status = ref<CONNECTION_STATUS>("disconnected");
+
+connectionStatusItem.watch((value) => {
+    status.value = value;
+});
 
 onMounted(async () => {
-    enabled.value = await enabledItem.getValue();
-    unwatch = enabledItem.watch((value) => {
-        enabled.value = value;
-    });
+    status.value = await getConnectionStatus();
 });
-
-onUnmounted(() => {
-    unwatch?.();
-});
-
-const toggle = () => {
-    enabledItem.setValue(!enabled.value);
-};
 </script>
 
 <style scoped>

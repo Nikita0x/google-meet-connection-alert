@@ -1,5 +1,5 @@
 import {
-    enabledItem,
+    // enabledItem,
     repeatIntervalMsItem,
     volumeItem,
     connectionStatusItem,
@@ -14,8 +14,8 @@ export default defineContentScript({
 });
 
 async function init() {
-    let [enabled, volume, repeatIntervalMs, connectionStatus] = await Promise.all([
-        enabledItem.getValue(),
+    let [volume, repeatIntervalMs, connectionStatus] = await Promise.all([
+        // enabledItem.getValue(),
         volumeItem.getValue(),
         repeatIntervalMsItem.getValue(),
         connectionStatusItem.getValue(),
@@ -33,15 +33,16 @@ async function init() {
         }
 
         stopRepeating();
+        playRestoreSound();
     });
 
     volumeItem.watch((value) => {
         volume = value;
     });
 
-    enabledItem.watch((value) => {
-        enabled = value;
-    });
+    // enabledItem.watch((value) => {
+    //     enabled = value;
+    // });
 
     repeatIntervalMsItem.watch((value) => {
         repeatIntervalMs = value;
@@ -81,5 +82,31 @@ async function init() {
             clearInterval(intervalID);
             intervalID = null;
         }
+    }
+
+    function playRestoreSound() {
+        console.log("connection restored...");
+
+        const now = audioContext.currentTime;
+
+        [
+            { offset: 0, frequency: 523.25 }, // C5
+            { offset: 0.15, frequency: 659.25 }, // E5
+            { offset: 0.3, frequency: 783.99 }, // G5
+            { offset: 0.45, frequency: 1046.5 }, // C6
+        ].forEach(({ offset, frequency }) => {
+            const osc = audioContext.createOscillator();
+            const gain = audioContext.createGain();
+
+            osc.type = "sine";
+            osc.frequency.value = frequency;
+
+            gain.gain.value = volume;
+
+            osc.connect(gain).connect(audioContext.destination);
+
+            osc.start(now + offset);
+            osc.stop(now + offset + 0.15);
+        });
     }
 }

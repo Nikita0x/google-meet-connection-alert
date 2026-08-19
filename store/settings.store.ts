@@ -25,9 +25,9 @@ export async function setConnectionStatus(status: CONNECTION_STATUS) {
     await connectionStatusItem.setValue(status);
 }
 
-export const enabledItem = storage.defineItem<boolean>("local:enabled", {
-    fallback: true,
-});
+// export const enabledItem = storage.defineItem<boolean>("local:enabled", {
+//     fallback: true,
+// });
 
 export const volumeItem = storage.defineItem<number>("local:volume", {
     fallback: 1,
