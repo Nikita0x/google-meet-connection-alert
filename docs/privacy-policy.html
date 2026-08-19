@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Privacy Policy — Google Meet Connection Alert</title>
+        <style>
+            :root {
+                --bg: #ffffff;
+                --fg: #201c2b;
+                --muted: #6b6478;
+                --border: #e4e0eb;
+                --code-bg: #f5f3f9;
+                --accent: #772ce8;
+            }
+            @media (prefers-color-scheme: dark) {
+                :root:not([data-theme="light"]) {
+                    --bg: #16141c;
+                    --fg: #f0eef5;
+                    --muted: #b0abc0;
+                    --border: #322e3d;
+                    --code-bg: #211f29;
+                    --accent: #a970ff;
+                }
+            }
+            :root[data-theme="dark"] {
+                --bg: #16141c;
+                --fg: #f0eef5;
+                --muted: #b0abc0;
+                --border: #322e3d;
+                --code-bg: #211f29;
+                --accent: #a970ff;
+            }
+            * {
+                box-sizing: border-box;
+            }
+            body {
+                margin: 0;
+                padding: 2.5rem 1.5rem 4rem;
+                background: var(--bg);
+                color: var(--fg);
+                font-family:
+                    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial,
+                    sans-serif;
+                line-height: 1.6;
+            }
+            main {
+                max-width: 720px;
+                margin: 0 auto;
+            }
+            h1 {
+                font-size: 1.75rem;
+                margin-bottom: 0.25rem;
+            }
+            .updated {
+                color: var(--muted);
+                font-size: 0.9rem;
+                margin-bottom: 2rem;
+            }
+            h2 {
+                font-size: 1.15rem;
+                margin-top: 2.25rem;
+                padding-bottom: 0.4rem;
+                border-bottom: 1px solid var(--border);
+            }
+            p,
+            li {
+                font-size: 0.97rem;
+            }
+            ul {
+                padding-left: 1.25rem;
+            }
+            li {
+                margin: 0.35rem 0;
+            }
+            code {
+                background: var(--code-bg);
+                padding: 0.1rem 0.35rem;
+                border-radius: 4px;
+                font-size: 0.88em;
+            }
+            table {
+                width: 100%;
+                border-collapse: collapse;
+                margin: 1rem 0;
+                font-size: 0.92rem;
+            }
+            th,
+            td {
+                text-align: left;
+                padding: 0.55rem 0.6rem;
+                border-bottom: 1px solid var(--border);
+                vertical-align: top;
+            }
+            th {
+                color: var(--muted);
+                font-weight: 600;
+            }
+            .note {
+                background: var(--code-bg);
+                border-left: 3px solid var(--accent);
+                padding: 0.75rem 1rem;
+                border-radius: 6px;
+                font-size: 0.92rem;
+                margin: 1rem 0;
+            }
+            a {
+                color: var(--accent);
+            }
+        </style>
+    </head>
+    <body>
+        <main>
+            <h1>Privacy Policy — Google Meet Connection Alert</h1>
+            <p class="updated">Last updated: August 19, 2026</p>
+
+            <p>
+                Google Meet Connection Alert ("the extension") monitors the network connection of
+                open Google Meet tabs and notifies you when the connection is lost or restored. This
+                page explains what data the extension accesses, what it stores, and what — if
+                anything — ever leaves your device.
+            </p>
+
+            <h2>1. Google Meet Connection Monitoring</h2>
+            <p>
+                The extension monitors network requests made by Google Meet in order to determine
+                whether the Meet connection is currently available.
+            </p>
+            <p>
+                The extension does <strong>not</strong> read or collect your meeting messages,
+                conversations, camera or microphone content, participants, recordings, or other
+                meeting content.
+            </p>
+            <p>
+                Network request information is used locally by the extension only to determine
+                whether the connection is working. The extension does <strong>not</strong> send this
+                network monitoring information to our servers or to third parties.
+            </p>
+
+            <h2>2. Data Stored On Your Device</h2>
+            <p>
+                The extension stores its settings and connection state locally using your browser's
+                built-in extension storage. This may include:
+            </p>
+            <ul>
+                <li>Your extension preferences, such as volume and notification interval</li>
+                <li>Your enabled/disabled settings</li>
+                <li>The current Google Meet connection status</li>
+            </ul>
+            <p>This information stays on your device and is not transmitted to us.</p>
+
+            <h2>3. Audio Notifications</h2>
+            <p>
+                When a Google Meet connection is detected as lost, the extension can play a short
+                audio alert. When the connection is restored, it can play a separate restoration
+                sound.
+            </p>
+            <p>
+                Audio is generated locally in your browser using the Web Audio API. The extension
+                does not record, upload, analyze, or otherwise collect audio from your device,
+                microphone, or Google Meet.
+            </p>
+
+            <h2>4. What We Don't Do</h2>
+            <ul>
+                <li>No analytics or tracking SDKs</li>
+                <li>No advertising or ad targeting</li>
+                <li>No selling or sharing of your data with third parties</li>
+                <li>No collection of browsing history</li>
+                <li>No collection of Google Meet conversations or meeting content</li>
+                <li>No transmission of network monitoring data to our servers</li>
+            </ul>
+
+            <h2>5. Permissions the Extension Requests</h2>
+            <table>
+                <tr>
+                    <th>Permission</th>
+                    <th>Why it's needed</th>
+                </tr>
+                <tr>
+                    <td><code>storage</code></td>
+                    <td>
+                        To store your extension preferences and the current Google Meet connection
+                        status locally on your device.
+                    </td>
+                </tr>
+                <tr>
+                    <td><code>webRequest</code></td>
+                    <td>
+                        To observe Google Meet network requests and detect when the Meet connection
+                        is lost or restored. Requests are only observed; they are not modified,
+                        blocked, or redirected.
+                    </td>
+                </tr>
+                <tr>
+                    <td>Host access to <code>meet.google.com</code></td>
+                    <td>
+                        To monitor Google Meet network requests and run the extension's content
+                        script on Google Meet pages. No other websites are accessed for this
+                        functionality.
+                    </td>
+                </tr>
+            </table>
+
+            <h2>6. Children's Privacy</h2>
+            <p>
+                The extension is not directed at children and does not knowingly collect personal
+                information from children.
+            </p>
+
+            <h2>7. Changes to This Policy</h2>
+            <p>
+                If this policy changes, the "Last updated" date at the top of this page will be
+                updated accordingly.
+            </p>
+
+            <h2>8. Contact</h2>
+            <p>
+                Questions about this policy or your data can be sent to
+                <a href="mailto:klirmio21@gmail.com">klirmio21@gmail.com</a>.
+            </p>
+        </main>
+    </body>
+</html>
