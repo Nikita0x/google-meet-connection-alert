@@ -1,6 +1,6 @@
 # Google Meet Connection Alert
 
-![Google Meet Connection Alert](src/public/store-screenshot.png)
+![Google Meet Connection Alert](public/store-screenshot.png)
 
 A lightweight Chrome extension that monitors your Google Meet connection and alerts you when the connection is lost or restored.
 
