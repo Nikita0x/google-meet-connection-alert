@@ -12,17 +12,17 @@ export default defineConfig({
         version: "1.0.0",
         permissions: ["storage", "webRequest"],
         host_permissions: ["https://meet.google.com/*"],
-        // icons: {
-        //     16: "icon16.png",
-        //     32: "icon32.png",
-        //     48: "icon48.png",
-        //     128: "icon128.png",
-        // },
-        // action: {
-        //     default_icon: {
-        //         16: "icon16.png",
-        //         32: "icon32.png",
-        //     },
-        // },
+        icons: {
+            16: "icon16.png",
+            32: "icon32.png",
+            48: "icon48.png",
+            128: "icon128.png",
+        },
+        action: {
+            default_icon: {
+                16: "icon16.png",
+                32: "icon32.png",
+            },
+        },
     },
 });
