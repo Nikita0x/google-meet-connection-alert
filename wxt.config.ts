@@ -9,7 +9,7 @@ export default defineConfig({
         name: "Google Meet Connection Alert",
         description:
             "Get instant sound alerts when your Google Meet connection is lost or restored.",
-        version: "1.0.0",
+        version: "1.0.1",
         permissions: ["storage", "webRequest"],
         host_permissions: ["https://meet.google.com/*"],
         icons: {

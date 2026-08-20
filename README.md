@@ -4,6 +4,8 @@
 
 A lightweight Chrome extension that monitors your Google Meet connection and alerts you when the connection is lost or restored.
 
+[<img src="public/chrome.png" alt="Chrome Web Store link" height="60px">](https://chromewebstore.google.com/detail/google-meet-connection-al/oggchpcljjoilijeagnbfoglgfnnnmem)
+
 ## Features
 
 - 🔴 **Connection lost alerts** — get a sound alert when Google Meet loses its network connection.
